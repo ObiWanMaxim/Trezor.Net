@@ -45,9 +45,6 @@
     <Reference Include="Hardwarewallets.Net, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hardwarewallets.Net.1.2.0\lib\net452\Hardwarewallets.Net.dll</HintPath>
     </Reference>
-    <Reference Include="Hid.Net, Version=1.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Hid.Net.1.4.0\lib\net452\Hid.Net.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\MSTest.TestFramework.1.3.2\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.dll</HintPath>
@@ -138,6 +135,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Hid.Net\Hid.Net\Hid.Net.csproj">
+      <Project>{7fc8b6f9-2df3-43b8-aed4-fc12594dcb33}</Project>
+      <Name>Hid.Net</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Trezor.Net\Trezor.Net.csproj">
       <Project>{dda97f34-2e5e-481c-83dd-ee58e9e6aaf0}</Project>
       <Name>Trezor.Net</Name>

@@ -12,7 +12,7 @@ namespace Trezor.Net
     {
         private async Task<IHidDevice> Connect()
         {
-            DeviceInformation trezorDeviceInformation = null;
+            WindowsDeviceInformation trezorDeviceInformation = null;
 
             WindowsHidDevice retVal = null;
 
