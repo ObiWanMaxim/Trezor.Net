@@ -4,6 +4,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Hardware.Usb;
 using Android.OS;
+using Hid.Net;
 using Hid.Net.Android;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
@@ -23,7 +24,7 @@ namespace Trezor.Net.XamarinFormsSample.Droid
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            _TrezorHidDevice = new AndroidHidDevice(GetSystemService(UsbService) as UsbManager, ApplicationContext, 3000, 64, TrezorManager.TrezorVendorId, TrezorManager.TrezorProductId);
+            _TrezorHidDevice = new AndroidHidDevice(GetSystemService(UsbService) as UsbManager, ApplicationContext, 3000, 64, new DeviceQuery { VendorProductIdPairs = { new VendorProductIdPair(21324, 1), new VendorProductIdPair(4617, 21440), new VendorProductIdPair(4617, 21441) } });
 
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
