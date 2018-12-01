@@ -1,7 +1,11 @@
 ﻿using Hid.Net;
 using Hid.Net.UWP;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using app = Trezor.Net.XamarinFormsSample.App;
+using wde = Windows.Devices.Enumeration;
 
 namespace Trezor.Net.XamarinFormsSample.UWP
 {
@@ -13,16 +17,25 @@ namespace Trezor.Net.XamarinFormsSample.UWP
         {
             InitializeComponent();
 
-            var taskCompletionSource = new TaskCompletionSource<IHidDevice>();
-            var trezorHidDevice = new UWPHidDevice();
-            trezorHidDevice.Connected += TrezorHidDevice_Connected;
-            poller = new UWPHidDevicePoller(TrezorManager.TrezorProductId, TrezorManager.TrezorVendorId, trezorHidDevice);
+            NewMethod();
+        }
+
+        private async Task NewMethod()
+        {
+
+            var asdasd = await GetDevicesByProductAndVendorAsync(1, 2);
+            var trezorHidDevice = new UWPHidDevice(asdasd[1].Id);
+            trezorHidDevice.DataHasExtraByte = false;
+            await trezorHidDevice.InitializeAsync();
+
             LoadApplication(new app(trezorHidDevice));
         }
 
-        private void TrezorHidDevice_Connected(object sender, System.EventArgs e)
+   
+        public static async Task<List<wde.DeviceInformation>> GetDevicesByProductAndVendorAsync(int vendorId, int productId)
         {
-            poller.Stop();
+            var asdasd =  ((IEnumerable<wde.DeviceInformation>)await wde.DeviceInformation.FindAllAsync().AsTask()).ToList();
+            return asdasd.Where(d => d.Id.Contains("1209")).ToList();
         }
     }
 }
