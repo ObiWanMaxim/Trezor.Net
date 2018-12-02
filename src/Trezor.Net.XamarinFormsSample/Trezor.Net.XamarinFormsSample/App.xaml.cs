@@ -27,14 +27,15 @@ namespace Trezor.Net.XamarinFormsSample
         {
             _TrezorManager = new TrezorManager(TrezorPinPad.GetPin, trezorHidDevice, new DefaultCoinUtility());
             InitializeComponent();
-            trezorHidDevice.Connected += TrezorHidDevice_Connected;
             MainNavigationPage = new NavigationPage(new MainPage());
             MainPage = MainNavigationPage;
+            BeginDisplayAddress();
         }
         #endregion
 
         #region Event Handlers
-        private void TrezorHidDevice_Connected(object sender, System.EventArgs e)
+
+        private void BeginDisplayAddress()
         {
             Device.BeginInvokeOnMainThread(async () =>
             {

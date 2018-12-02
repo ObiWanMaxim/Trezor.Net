@@ -66,7 +66,8 @@
 
     <DeviceCapability Name="usb">
       <Device Id="vidpid:1209 53C1">
-        <Function Type="name:vendorSpecific" />
+        <Function Type="name:vendorSpecific"/>
+        <!--<Function Type="classId:ff * *" />-->     
       </Device>
     </DeviceCapability>
 
