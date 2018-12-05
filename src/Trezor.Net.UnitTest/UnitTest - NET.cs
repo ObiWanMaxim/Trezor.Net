@@ -18,7 +18,7 @@ namespace Trezor.Net
 
             while (trezorDeviceInformation == null)
             {
-                var devices = WindowsHidDevice.GetConnectedDeviceInformations();
+                var devices = WindowsDevice.GetConnectedDeviceInformations();
 
                 //1.6.x Device By Id
                 //trezorDeviceInformation = devices.FirstOrDefault(d => d.DevicePath == @"\\?\hid#vid_534c&pid_0001&mi_00#7&b861b22&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}");
@@ -36,7 +36,7 @@ namespace Trezor.Net
                 Console.Write(".");
             }
 
-            var retVal = new WindowsHidDevice(trezorDeviceInformation, 65, 65);
+            var retVal = new WindowsDevice(trezorDeviceInformation.DevicePath, 65, 65);
 
             await retVal.InitializeAsync();
 
