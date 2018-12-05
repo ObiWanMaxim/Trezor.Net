@@ -14,10 +14,6 @@ namespace Trezor.Net
         {
             DeviceInformation trezorDeviceInformation = null;
 
-            WindowsHidDevice retVal = null;
-
-            retVal = new WindowsHidDevice();
-
             Console.Write("Waiting for Trezor .");
 
             while (trezorDeviceInformation == null)
@@ -37,7 +33,7 @@ namespace Trezor.Net
                 Console.Write(".");
             }
 
-            retVal.DeviceInformation = trezorDeviceInformation;
+            var retVal = new WindowsHidDevice(trezorDeviceInformation, 65, 65);
 
             await retVal.InitializeAsync();
 
