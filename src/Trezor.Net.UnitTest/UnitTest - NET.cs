@@ -22,7 +22,8 @@ namespace Trezor.Net
                 //var trezors = devices.Where(d => d.VendorId == TrezorManager.TrezorVendorId && TrezorManager.TrezorProductId == d.ProductId).ToList();
                 //trezorDeviceInformation = trezors.FirstOrDefault(t => t.UsagePage == TrezorManager.AcceptedUsagePages[0]);
 
-                trezorDeviceInformation = devices.FirstOrDefault(d => d.DevicePath == @"\\?\hid#vid_534c&pid_0001&mi_00#7&b861b22&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}");
+                var enumerable = devices.Where(d => d.DevicePath.Contains("1209")).ToList();
+                trezorDeviceInformation = enumerable.FirstOrDefault();
 
                 if (trezorDeviceInformation != null)
                 {
