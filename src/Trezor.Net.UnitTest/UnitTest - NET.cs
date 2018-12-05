@@ -18,7 +18,7 @@ namespace Trezor.Net
 
             while (trezorDeviceInformation == null)
             {
-                var devices = WindowsDevice.GetConnectedDeviceInformations();
+                var devices = WindowsDeviceBase.GetConnectedDeviceInformations(WindowsDeviceConstants.GUID_DEVINTERFACE_USB_DEVICE);
 
                 //1.6.x Device By Id
                 trezorDeviceInformation = devices.FirstOrDefault(d => d.DevicePath.Contains("534c"));
@@ -36,7 +36,7 @@ namespace Trezor.Net
                 Console.Write(".");
             }
 
-            var retVal = new WindowsDevice(trezorDeviceInformation.DevicePath, 65, 65);
+            var retVal = new WindowsUsbDevice(trezorDeviceInformation.DevicePath, 65, 65);
             retVal.DataHasExtraByte = true;
 
             await retVal.InitializeAsync();

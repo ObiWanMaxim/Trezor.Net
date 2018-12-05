@@ -39,7 +39,7 @@ namespace TrezorTestApp
 
             while (trezorDeviceInformation == null)
             {
-                var devices = WindowsDeviceBase.GetConnectedDeviceInformations();
+                var devices = WindowsDeviceBase.GetConnectedDeviceInformations(WindowsDeviceConstants.GUID_DEVINTERFACE_USB_DEVICE);
                 var trezors = devices.Where(d => d.VendorId == TrezorManager.TrezorVendorId && TrezorManager.TrezorProductId == 1).ToList();
                 trezorDeviceInformation = trezors.FirstOrDefault(t => t.UsagePage == TrezorManager.AcceptedUsagePages[0]);
 
@@ -52,7 +52,7 @@ namespace TrezorTestApp
                 Console.Write(".");
             }
 
-            var retVal = new WindowsDevice(trezorDeviceInformation.DevicePath, 65, 65);
+            var retVal = new WindowsUsbDevice(trezorDeviceInformation.DevicePath, 65, 65);
 
             await retVal.InitializeAsync();
 
