@@ -31,7 +31,7 @@ namespace TrezorTestApp
         #endregion
 
         #region Private  Methods
-        private static async Task<IHidDevice> Connect()
+        private static async Task<IDevice> Connect()
         {
             DeviceInformation trezorDeviceInformation = null;
 

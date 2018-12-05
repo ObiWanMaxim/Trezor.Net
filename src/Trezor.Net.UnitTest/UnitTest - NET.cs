@@ -10,7 +10,7 @@ namespace Trezor.Net
 {
     public partial class UnitTest
     {
-        private async Task<IHidDevice> Connect()
+        private async Task<IDevice> Connect()
         {
             DeviceInformation trezorDeviceInformation = null;
 
