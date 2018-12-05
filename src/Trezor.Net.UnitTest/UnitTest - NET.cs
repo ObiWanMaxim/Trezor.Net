@@ -21,11 +21,11 @@ namespace Trezor.Net
                 var devices = WindowsDevice.GetConnectedDeviceInformations();
 
                 //1.6.x Device By Id
-                //trezorDeviceInformation = devices.FirstOrDefault(d => d.DevicePath == @"\\?\hid#vid_534c&pid_0001&mi_00#7&b861b22&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}");
+                trezorDeviceInformation = devices.FirstOrDefault(d => d.DevicePath.Contains("534c"));
 
                 //1.7.x Device By Vid
-                var enumerable = devices.Where(d => d.DevicePath.Contains("1209")).ToList();
-                trezorDeviceInformation = enumerable.FirstOrDefault();
+                //var enumerable = devices.Where(d => d.DevicePath.Contains("1209")).ToList();
+                //trezorDeviceInformation = enumerable.FirstOrDefault();
 
                 if (trezorDeviceInformation != null)
                 {
@@ -37,6 +37,7 @@ namespace Trezor.Net
             }
 
             var retVal = new WindowsDevice(trezorDeviceInformation.DevicePath, 65, 65);
+            retVal.DataHasExtraByte = true;
 
             await retVal.InitializeAsync();
 
