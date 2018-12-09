@@ -129,6 +129,10 @@
     <Compile Include="UnitTest - NET.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\..\LibUsbDotNetMine\src\Examples\Read.Write\libusb-1.0.lib">
+      <Link>libusb-1.0.lib</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
@@ -145,6 +149,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\..\LibUsbDotNetMine\src\Examples\Read.Write\libusb-1.0.dll">
+      <Link>libusb-1.0.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\..\LibUsbDotNetMine\src\Examples\Read.Write\libusb-1.0.pdb">
+      <Link>libusb-1.0.pdb</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Misc\GetPassword.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
