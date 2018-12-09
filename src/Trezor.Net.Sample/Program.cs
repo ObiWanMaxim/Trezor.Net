@@ -40,16 +40,17 @@ namespace TrezorTestApp
             while (trezorDeviceInformation == null)
             {
                 var devices = WindowsDeviceBase.GetConnectedDeviceInformations(WindowsDeviceConstants.GUID_DEVINTERFACE_USB_DEVICE);
-                var trezors = devices.Where(d => d.VendorId == TrezorManager.TrezorVendorId && TrezorManager.TrezorProductId == 1).ToList();
-                trezorDeviceInformation = trezors.FirstOrDefault(t => t.UsagePage == TrezorManager.AcceptedUsagePages[0]);
+                throw new NotImplementedException();
+                //var trezors = devices.Where(d => d.VendorId == TrezorManager.TrezorVendorId && TrezorManager.TrezorProductId == 1).ToList();
+                //trezorDeviceInformation = trezors.FirstOrDefault(t => t.UsagePage == TrezorManager.AcceptedUsagePages[0]);
 
-                if (trezorDeviceInformation != null)
-                {
-                    break;
-                }
+                //if (trezorDeviceInformation != null)
+                //{
+                //    break;
+                //}
 
-                await Task.Delay(1000);
-                Console.Write(".");
+                //await Task.Delay(1000);
+                //Console.Write(".");
             }
 
             var retVal = new WindowsUsbDevice(trezorDeviceInformation.DevicePath, 65, 65);
