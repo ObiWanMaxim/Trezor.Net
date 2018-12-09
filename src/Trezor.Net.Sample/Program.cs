@@ -53,7 +53,7 @@ namespace TrezorTestApp
                 //Console.Write(".");
             }
 
-            var retVal = new WindowsUsbDevice(trezorDeviceInformation.DevicePath, 65, 65);
+            var retVal = new WindowsUsbDevice(trezorDeviceInformation.DevicePath, 64, 64);
 
             await retVal.InitializeAsync();
 
