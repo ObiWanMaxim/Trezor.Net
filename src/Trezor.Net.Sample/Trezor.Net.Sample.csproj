@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Hid.Net\Hid.Net\Hid.Net.csproj" />
     <ProjectReference Include="..\Trezor.Net\Trezor.Net.csproj" />
   </ItemGroup>
 
