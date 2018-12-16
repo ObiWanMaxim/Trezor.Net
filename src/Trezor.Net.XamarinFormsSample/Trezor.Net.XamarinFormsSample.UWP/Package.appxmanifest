@@ -56,19 +56,24 @@
     
     <DeviceCapability Name="humaninterfacedevice">
 
-	    <Device Id="vidpid:534C 0001">
+	  <Device Id="vidpid:534C 0001">
+        <Function Type="usage:0005 *" />
+        <Function Type="usage:FF00 0001" />
+        <Function Type="usage:ff00 *" />
+      </Device>
+      
+      <Device Id="vidpid:1209 53C0">
         <Function Type="usage:0005 *" />
         <Function Type="usage:FF00 0001" />
         <Function Type="usage:ff00 *" />
       </Device>
 
-    </DeviceCapability>
-
-    <DeviceCapability Name="usb">
       <Device Id="vidpid:1209 53C1">
-        <Function Type="name:vendorSpecific"/>
-        <!--<Function Type="classId:ff * *" />-->     
+        <Function Type="usage:0005 *" />
+        <Function Type="usage:FF00 0001" />
+        <Function Type="usage:ff00 *" />
       </Device>
+
     </DeviceCapability>
 
     <DeviceCapability Name="usb">
