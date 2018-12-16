@@ -1,36 +1,47 @@
 ﻿using Hardwarewallets.Net;
 using Hardwarewallets.Net.AddressManagement;
+using Hid.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NBitcoin;
 using Nethereum.Hex.HexConvertors.Extensions;
 using Nethereum.RLP;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using System.Threading.Tasks;
+using Trezor.Net.Contracts.Bitcoin;
 using Trezor.Net.Contracts.Ethereum;
 
 namespace Trezor.Net
 {
     [TestClass]
-    public partial class UnitTest
+    public abstract partial class UnitTestBase
     {
-        private static TrezorManager TrezorManager;
-        private static readonly string[] _Addresses = new string[50];
+        #region Fields
+        protected TrezorManager TrezorManager;
+        private readonly string[] _Addresses = new string[50];
+        #endregion
 
-        private static async Task<string> GetAddressAsync(uint index)
+        #region Protected Abstract Methods
+        protected abstract Task<IHidDevice> Connect();
+        protected abstract Task<string> GetPin();
+        #endregion
+
+        #region Helpers
+        private async Task<string> GetAddressAsync(uint index)
         {
             return await GetAddressAsync(true, 0, false, index, false);
         }
 
-        private static async Task<string> GetAddressAsync(uint coinNumber, bool display)
+        private async Task<string> GetAddressAsync(uint coinNumber, bool display)
         {
             var coinInfo = TrezorManager.CoinUtility.GetCoinInfo(coinNumber);
             var address = await GetAddressAsync(coinInfo.IsSegwit, coinInfo.CoinType, false, 0, display);
             return address;
         }
 
-        private static async Task<string> GetAddressAsync(bool isSegwit, uint coinNumber, bool isChange, uint index, bool display, string coinName = null, bool isPublicKey = false)
+        private async Task<string> GetAddressAsync(bool isSegwit, uint coinNumber, bool isChange, uint index, bool display, string coinName = null, bool isPublicKey = false)
         {
             var addressPath = new BIP44AddressPath(isSegwit, coinNumber, 0, isChange, index);
             var firstAddress = await TrezorManager.GetAddressAsync(addressPath, isPublicKey, display);
@@ -42,10 +53,149 @@ namespace Trezor.Net
             return secondAddress;
         }
 
-        private static Task<string> GetAddressAsync(string addressPath, bool display = false, string coinName = null, bool isPublicKey = false)
+        private Task<string> GetAddressAsync(string addressPath, bool display = false, string coinName = null, bool isPublicKey = false)
         {
             var bip44AddressPath = AddressPathBase.Parse<BIP44AddressPath>(addressPath);
             return TrezorManager.GetAddressAsync(bip44AddressPath, isPublicKey, display);
+        }
+
+        private async Task GetAndInitialize()
+        {
+            if (TrezorManager != null)
+            {
+                return;
+            }
+
+            var trezorHidDevice = await Connect();
+            TrezorManager = new TrezorManager(GetPin, trezorHidDevice, new DefaultCoinUtility());
+            await TrezorManager.InitializeAsync();
+        }
+
+        private async Task DoGetAddress(uint i)
+        {
+            var address = await GetAddressAsync(i);
+            _Addresses[i] = address;
+        }
+        #endregion
+
+        #region Tests
+        /// <summary>
+        /// Special thanks to https://github.com/ljupko123
+        /// </summary>
+        /// <returns></returns>
+        [TestMethod]
+        public async Task SignBitcoinTransactionAsync()
+        {
+            // initialize connection with device
+            await GetAndInitialize();
+
+            //get address path for address in Trezor
+            var addressPath = AddressPathBase.Parse<BIP44AddressPath>("m/49'/0'/0'/0/0").ToArray();
+
+            // previous unspent input of Transaction
+            var txInput = new TxAck.TransactionType.TxInputType()
+            {
+                AddressNs = addressPath,
+                Amount = 100837,
+                ScriptType = InputScriptType.Spendp2shwitness,
+                PrevHash = "3becf448ae38cf08c0db3c6de2acb8e47acf6953331a466fca76165fdef1ccb7".ToHexBytes(), // transaction ID
+                PrevIndex = 0,
+                Sequence = 4294967293 // Sequence  number represent Replace By Fee 4294967293 or leave empty for default 
+            };
+
+            // TX we want to make a payment
+            var txOut = new TxAck.TransactionType.TxOutputType()
+            {
+                AddressNs = new uint[0],
+                Amount = 100837,
+                Address = "18UxSJMw7D4UEiRqWkArN1Lq7VSGX6qH3H",
+                ScriptType = TxAck.TransactionType.TxOutputType.OutputScriptType.Paytoaddress // if is segwit use Spendp2shwitness
+
+            };
+
+            // Must be filled with basic data like below
+            var signTx = new SignTx()
+            {
+                Expiry = 0,
+                LockTime = 0,
+                CoinName = "Bitcoin",
+                Version = 2,
+                OutputsCount = 1,
+                InputsCount = 1
+            };
+
+            // For every TX request from Trezor to us, we response with TxAck like below
+            var txAck = new TxAck()
+            {
+                Tx = new TxAck.TransactionType()
+                {
+                    Inputs = { txInput }, // Tx Inputs
+                    Outputs = { txOut },   // Tx Outputs
+                    Expiry = 0,
+                    InputsCnt = 1, // must be exact number of Inputs count
+                    OutputsCnt = 1, // must be exact number of Outputs count
+                    Version = 2
+                }
+            };
+
+            // If the field serialized.serialized_tx from Trezor is set,
+            // it contains a chunk of the signed transaction in serialized format.
+            // The chunks are returned in the right order and just concatenating all returned chunks will result in the signed transaction.
+            // So we need to add chunks to the list
+            var serializedTx = new List<byte>();
+
+            // We send SignTx() to the Trezor and we wait him to send us Request
+            var request = await TrezorManager.SendMessageAsync<TxRequest, SignTx>(signTx);
+
+            // We do loop here since we need to send over and over the same transactions to trezor because his 64 kilobytes memory
+            // and he will sign chunks and return part of signed chunk in serialized manner, until we receive finall type of Txrequest TxFinished
+            while (request.request_type != TxRequest.RequestType.Txfinished)
+            {
+                switch (request.request_type)
+                {
+                    case TxRequest.RequestType.Txinput:
+                        {
+                            //We send TxAck() with  TxInputs
+                            request = await TrezorManager.SendMessageAsync<TxRequest, TxAck>(txAck);
+
+                            // Now we have to check every response is there any SerializedTx chunk 
+                            if (request.Serialized != null)
+                            {
+                                // if there is any we add to our list bytes
+                                serializedTx.AddRange(request.Serialized.SerializedTx);
+                            }
+
+                            break;
+                        }
+                    case TxRequest.RequestType.Txoutput:
+                        {
+                            //We send TxAck()  with  TxOutputs
+                            request = await TrezorManager.SendMessageAsync<TxRequest, object>(txAck);
+
+                            // Now we have to check every response is there any SerializedTx chunk 
+                            if (request.Serialized != null)
+                            {
+                                // if there is any we add to our list bytes
+                                serializedTx.AddRange(request.Serialized.SerializedTx);
+                            }
+
+                            break;
+                        }
+
+                    case TxRequest.RequestType.Txextradata:
+                        {
+                            // for now he didn't ask me for extra data :)
+                            break;
+                        }
+                    case TxRequest.RequestType.Txmeta:
+                        {
+                            // for now he didn't ask me for extra Tx meta data :)
+                            break;
+                        }
+                }
+            }
+
+            Debug.WriteLine($"TxSignature: {serializedTx.ToArray().ToHexCompact()}");
         }
 
         [TestMethod]
@@ -206,23 +356,6 @@ namespace Trezor.Net
             var bitcoinCashCoinInfo = defaultCoinUtility.GetCoinInfo(145);
             Assert.IsTrue(bitcoinCashCoinInfo.CoinName == "Bcash");
         }
-
-        private async Task GetAndInitialize()
-        {
-            if (TrezorManager != null)
-            {
-                return;
-            }
-
-            var trezorHidDevice = await Connect();
-            TrezorManager = new TrezorManager(GetPin, trezorHidDevice, new DefaultCoinUtility());
-            await TrezorManager.InitializeAsync();
-        }
-
-        private static async Task DoGetAddress(uint i)
-        {
-            var address = await GetAddressAsync(i);
-            _Addresses[i] = address;
-        }
+        #endregion
     }
 }

@@ -1,38 +1,81 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Hid.Net;
+using LibUsbDotNet.LibUsb;
+using LibUsbDotNet.Main;
+using System;
 using System.Threading.Tasks;
 
-namespace Hid.Net
+namespace Trezor.Net
 {
-    public class LibUsbDevice : IDevice
+    public class LibUsbDevice : IHidDevice
     {
+        #region Fields
+        private UsbEndpointReader _UsbEndpointReader;
+        private UsbEndpointWriter _UsbEndpointWriter;
+        private int ReadPacketSize;
+        #endregion
+
+        public IUsbDevice UsbDevice { get; }
+        public int VendorId => UsbDevice.VendorId;
+        public int ProductId => UsbDevice.ProductId;
+        public int Timeout { get; }
+        #endregion
+
+        #region Events
         public event EventHandler Connected;
         public event EventHandler Disconnected;
+        #endregion
 
+        #region Constructor
+        public LibUsbDevice(IUsbDevice usbDevice, int timeout)
+        {
+            UsbDevice = usbDevice;
+            Timeout = timeout;
+        }
+        #endregion
+
+        #region Implementation
         public void Dispose()
         {
-            throw new NotImplementedException();
+            UsbDevice.Dispose();
         }
 
-        public Task<bool> GetIsConnectedAsync()
+        public async Task<bool> GetIsConnectedAsync()
         {
-            throw new NotImplementedException();
+            return true;
         }
 
-        public Task InitializeAsync()
+        public async Task InitializeAsync()
         {
-            throw new NotImplementedException();
+            await Task.Run(() =>
+            {
+                //TODO: Error handling etc.
+                UsbDevice.Open();
+                UsbDevice.ClaimInterface(UsbDevice.Configs[0].Interfaces[0].Number);
+                _UsbEndpointWriter = UsbDevice.OpenEndpointWriter(WriteEndpointID.Ep01);
+                _UsbEndpointReader = UsbDevice.OpenEndpointReader(ReadEndpointID.Ep01);
+                ReadPacketSize = _UsbEndpointReader.EndpointInfo.MaxPacketSize;
+            });
         }
 
-        public Task<byte[]> ReadAsync()
+        public async Task<byte[]> ReadAsync()
         {
-            throw new NotImplementedException();
+            return await Task.Run(() =>
+            {
+                var buffer = new byte[ReadPacketSize];
+
+                _UsbEndpointReader.Read(buffer, Timeout, out var bytesRead);
+
+                return buffer;
+            });
         }
 
-        public Task WriteAsync(byte[] data)
+        public async Task WriteAsync(byte[] data)
         {
-            throw new NotImplementedException();
+            await Task.Run(() =>
+            {
+                _UsbEndpointWriter.Write(data, Timeout, out var bytesWritten);
+            });
         }
+        #endregion
     }
 }
