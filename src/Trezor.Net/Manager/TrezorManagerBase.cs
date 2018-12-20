@@ -1,6 +1,6 @@
-﻿using Hardwarewallets.Net;
+﻿using Device.Net;
+using Hardwarewallets.Net;
 using Hardwarewallets.Net.Model;
-using Hid.Net;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
