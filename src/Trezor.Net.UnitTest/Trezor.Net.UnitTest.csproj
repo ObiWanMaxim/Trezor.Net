@@ -151,10 +151,6 @@
     <Compile Include="WindowsTestBase.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\LibUsbDotNetMine\src\Examples\Read.Write\libusb-1.0.lib">
-      <Link>libusb-1.0.lib</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="app.config" />
     <Content Include="libusb-1.0.lib">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

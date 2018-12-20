@@ -1,9 +1,8 @@
 ﻿using Device.Net;
 using Hardwarewallets.Net.AddressManagement;
-using Hid.Net.Windows;
+using Hid.Net;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Trezor.Net;
 
@@ -34,7 +33,7 @@ namespace TrezorTestApp
         #region Private  Methods
         private static async Task<IDevice> Connect()
         {
-            WindowsHidDeviceInformation trezorDeviceInformation = null;
+            WindowsDeviceInformation trezorDeviceInformation = null;
 
             Console.Write("Waiting for Trezor .");
 

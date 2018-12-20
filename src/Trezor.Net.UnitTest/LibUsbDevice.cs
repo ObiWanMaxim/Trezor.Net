@@ -14,6 +14,7 @@ namespace Trezor.Net
         private int ReadPacketSize;
         #endregion
 
+        #region Public Properties
         public IUsbDevice UsbDevice { get; }
         public int VendorId => UsbDevice.VendorId;
         public int ProductId => UsbDevice.ProductId;
