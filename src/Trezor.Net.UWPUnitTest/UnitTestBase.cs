@@ -1,6 +1,6 @@
-﻿using Hardwarewallets.Net;
+﻿using Device.Net;
+using Hardwarewallets.Net;
 using Hardwarewallets.Net.AddressManagement;
-using Hid.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NBitcoin;
 using Nethereum.Hex.HexConvertors.Extensions;
@@ -24,7 +24,7 @@ namespace Trezor.Net
         #endregion
 
         #region Protected Abstract Methods
-        protected abstract Task<IHidDevice> Connect();
+        protected abstract Task<IDevice> Connect();
         protected abstract Task<string> GetPin();
         #endregion
 

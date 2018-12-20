@@ -1,4 +1,4 @@
-﻿using Hid.Net;
+﻿using Device.Net;
 using LibUsbDotNet.LibUsb;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -16,7 +16,7 @@ namespace Trezor.Net
         #endregion
 
         #region Implementation
-        protected override async Task<IHidDevice> Connect()
+        protected override async Task<IDevice> Connect()
         {
             _UsbContext = new UsbContext();
 

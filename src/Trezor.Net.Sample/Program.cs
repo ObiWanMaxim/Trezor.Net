@@ -1,5 +1,6 @@
-﻿using Hardwarewallets.Net.AddressManagement;
-using Hid.Net;
+﻿using Device.Net;
+using Hardwarewallets.Net.AddressManagement;
+using Hid.Net.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,9 +32,9 @@ namespace TrezorTestApp
         #endregion
 
         #region Private  Methods
-        private static async Task<IHidDevice> Connect()
+        private static async Task<IDevice> Connect()
         {
-            WindowsDeviceInformation trezorDeviceInformation = null;
+            WindowsHidDeviceInformation trezorDeviceInformation = null;
 
             WindowsHidDevice retVal = null;
 
@@ -43,7 +44,7 @@ namespace TrezorTestApp
 
             while (trezorDeviceInformation == null)
             {
-                var devices = WindowsHidDevice.GetConnectedDeviceInformations();
+                var devices = WindowsHidDevice.GetConnectedDeviceInformations().Cast<WindowsHidDeviceInformation>();
                 var trezors = devices.Where(d => d.VendorId == TrezorManager.TrezorVendorId && TrezorManager.TrezorProductId == 1).ToList();
                 trezorDeviceInformation = trezors.FirstOrDefault(t => t.UsagePage == TrezorManager.AcceptedUsagePages[0]);
 
